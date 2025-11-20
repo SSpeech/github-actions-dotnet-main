@@ -20,7 +20,7 @@ jobs:
         run: dotnet test --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish src/GitHubActionsDotNet.Api/src/GitHubActionsDotNet.Api.csproj --configuration Release -o artifacts
+        run: dotnet publish src/GitHubActionsDotNet.Api/GitHubActionsDotNet.Api.csproj --configuration Release -o artifacts
 
       - name: upload artifact
         uses: actions/upload-artifact@v4
@@ -49,6 +49,6 @@ jobs:
 
       - name: deploy web apps artifacts
         uses: azure/webapps-deploy@v2
-        with:
+        with: 
           app-name: app-actionlearn-dev-europecentralspain-001
           package: artifacts/
