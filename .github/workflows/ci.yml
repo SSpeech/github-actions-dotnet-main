@@ -41,7 +41,7 @@ jobs:
           paths: artifacts/
 
       - name: deploy web apps artifacts
-        uses: azure/websapps-deploys@v4
+        uses: azure/websapps-deploy@v2
         with: 
           app-name: app-actionlearn-dev-europecentralspain-001
           package: artifacts/
