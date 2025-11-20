@@ -1,10 +1,10 @@
-name: Pr Verify
+name: CI
 on:
-  pull_request:
+  push:
       branches: [ "main" ]
 jobs:
   build:
-    name: Pr verify
+    name: CI
     runs-on: ubuntu-latest
 
     steps:
@@ -18,3 +18,30 @@ jobs:
 
       - name: dotnet test
         run: dotnet test --configuration Release
+
+      - name: dotnet publish
+        run: dotnet publish src/GitHubActionsDotNet.Api/src/GitHubActionsDotNet.Api.csproj --configuration Release -o artifacts
+
+      - name: upload artifact
+        uses: actions/upload-artifact@v4
+        with: 
+          name: action-artifact
+          path: artifacts/
+
+  Deploy_dev:
+    name: deploy dev
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+      - name: download artifact
+        uses: actions/download-artifact@v4
+        with: 
+          name: action-artifact
+          paths: artifacts/
+
+      - name: deploy web apps artifacts
+        uses: azure/websapps-deploys@v4
+        with: 
+          app-name: app-actionlearn-dev-europecentralspain-001
+          package: artifacts/
