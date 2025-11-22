@@ -53,5 +53,5 @@ jobs:
       - name: deploy web apps artifacts
         uses: azure/webapps-deploy@v2
         with:
-          app-name: app-actionlearn-dev-europecentralspain-001
+          app-name: ${{ secrets.AZURE_APP_NAME }}
           package: artifacts/
