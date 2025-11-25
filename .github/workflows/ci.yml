@@ -22,10 +22,10 @@ jobs:
         - name: checkout
           uses: actions/checkout@v4
 
-        - name: set up dontnet
+        - name: set up dotnet
           uses: actions/setup-dotnet@v4
           with:
-            dontnet-version: ${{env.DOTNET_VERSION}}
+            dotnet-version: ${{env.DOTNET_VERSION}}
 
         - name: dotnet build
           run: dotnet build --configuration Release
