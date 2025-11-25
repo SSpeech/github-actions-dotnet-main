@@ -1,45 +1,44 @@
+name: steps-deploy 
+env: 
+    ARTIFACT_PATH: artifacts/
+
 on: 
-  workflow_call:
-    inputs:
-     environment-name:
-       type: string
-       required: true
-       
-    secrets:
-     AZURE_CLIENT_ID: 
-       description: client id 
-       required: true
-     AZURE_TENANT_ID: 
-       description: tenant id  
-       required: true
-     AZURE_SUBSCRIPTION_ID: 
-       description: subscrption id  
-       required: true
-     AZURE_APP_NAME: 
-       description: App name  
-       required: true
-     
+    workflow_call:
+        inputs: 
+            environment-name: 
+                type: string 
+                required: true
+        secrets:
+            AZURE_CLIENT_ID:
+                required: true       
+            AZURE_TENANT_ID:
+                required: true       
+            AZURE_SUBSCRIPTION_ID:
+                required: true       
+            AZURE_APP_NAME:
+                required: true       
 jobs:
-  Deploy:
-      name: deploy ${{ inputs.environment-name }}
-      runs-on: ubuntu-latest
-      environment: ${{ inputs.environment-name }}
-      steps:
-        - name: download artifact
-          uses: actions/download-artifact@v4
-          with:
-            name: action-artifact
-            path: artifacts/
-  
-        - name: Azure login
-          uses: azure/login@v2
-          with:
-            client-id: ${{ secrets.AZURE_CLIENT_ID }}
-            tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-            subscription-id: ${{secrets.AZURE_SUBSCRIPTION_ID}}
-  
-        - name: deploy web apps artifacts
-          uses: azure/webapps-deploy@v2
-          with:
-            app-name: ${{ secrets.AZURE_APP_NAME }}
-            package: artifacts/
+    deploy:
+        name: deploy to ${{inputs.environment-name}}
+        runs-on: ubuntu-latest
+        environment: ${{inputs.environment-name}}
+
+        steps: 
+            - name: download artifact
+              uses: actions/download-artifact@v4
+              with: 
+                name: artifact-learn
+                path: ${{env.ARTIFACT_PATH}}
+            
+            - name: azure login 
+              uses: azure/login@v2
+              with: 
+                client-id: ${{secrets.AZURE_CLIENT_ID}}
+                tenant-íd: ${{secrets.AZURE_TENANT_ID}}
+                subscription-id: ${{secrets.AZURE_SUBSCRIPTION_ID}}
+
+            - name: deploy artifact
+              uses: azure/webapps-deploy@v2 
+              with: 
+                app-name: ${{secrets.AZURE_APP_NAME}}
+                package: ${{env.ARTIFACT_PATH}}
