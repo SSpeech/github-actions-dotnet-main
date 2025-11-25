@@ -1,54 +1,64 @@
-name: CI
+name: CI/CD - Build & Deploy
+
+env: 
+  DOTNET_VERSION: 8.0
+  ARTIFACT_PATH: artifacts/
 on:
   push:
-    branches: ["main"]
+    branches: [main]
+
+  workflow_dispatch:
+
 permissions:
   id-token: write
   contents: read
+
 jobs:
-  build:
-    name: CI
-    runs-on: ubuntu-latest
+    build:
+      name: build and test
+      runs-on: ubuntu-latest
 
-    steps:
-      - name: checkout repo
-        uses: actions/checkout@v4
+      steps:
+        - name: checkout
+          uses: actions/checkout@v4
 
-      - name: Set up .NET Core
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 8.0
+        - name: set up dontnet
+          uses: actions/setup-dontnet@v4
+          with:
+            dontnet-version: ${{env.DOTNET_VERSION}}
 
-      - name: dotnet test
-        run: dotnet test --configuration Release
+        - name: dotnet build
+          run: dotnet build --configuration Release
 
-      - name: dotnet publish
-        run: dotnet publish src/GitHubActionsDotNet.Api/GitHubActionsDotNet.Api.csproj --configuration Release -o artifacts
+        - name: dotnet test
+          run: dotnet test --configuration Release --no-build
 
-      - name: upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: action-artifact
-          path: artifacts/
+        - name: dotnet format
+          run: dotnet format -v detailed --verify-no-changes 
 
-  Deploy_dev:
-    needs: build
-    uses: ./.github/workflows/deploy.yml
-    with: 
-      environment-name: dev
-    secrets:
-     AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-     AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-     AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID}}
-     AZURE_APP_NAME: ${{ secrets.AZURE_APP_NAME }}
-     
-  Deploy_pro:
-    needs: Deploy_dev
-    uses: ./.github/workflows/deploy.yml
-    with: 
-      environment-name: pro
-    secrets:
-     AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-     AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-     AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID}}
-     AZURE_APP_NAME: ${{ secrets.AZURE_APP_NAME }}
+        - name: dotnet publish
+          run: dotnet publish src/GitHubActionsDotNet.Api/GitHubActionsDotNet.Api.csproj --configuration Release -o artifacts
+
+        - name: upload artifact
+          uses: actions/upload-artifact@v4
+          with:
+            name: artifact-learn
+            path: ${{env.ARTIFACT_PATH}}
+      
+    deploy_dev: 
+          uses: ./.github/workflows/deploy.yml
+          with: 
+            environment-name: dev
+          needs: build
+          secrets: inherit
+
+    deploy_prod: 
+          uses: ./.github/workflows/deploy.yml
+          with: 
+            environment-name: prod
+          needs: build
+          secrets: 
+              AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+              AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+              AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+              AZURE_APP_NAME: ${{ secrets.AZURE_APP_NAME }}
