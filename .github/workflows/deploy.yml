@@ -3,8 +3,7 @@ on:
     inputs:
      environment-name:
        type: string
-       required: true
-       
+       required: true 
     secrets:
      AZURE_CLIENT_ID: 
        description: client id 
