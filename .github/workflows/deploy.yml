@@ -48,5 +48,6 @@ jobs:
                 slot-name: slot
 
             - name: Swap slot to production
-              run: az webapp deployment slot swap -g ${{ inputs.resource-group }} -n ${{ secrets.AZURE_APP_NAME }} --slot slot --target-slot production --verbose
+              run: |
+                  az webapp deployment slot swap -g ${{ inputs.resource-group }} -n ${{ secrets.AZURE_APP_NAME }} --slot slot --target-slot production --verbose
 
