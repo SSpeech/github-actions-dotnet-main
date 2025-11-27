@@ -44,8 +44,8 @@ jobs:
               uses: azure/webapps-deploy@v2 
               with: 
                 app-name: ${{secrets.AZURE_APP_NAME}}
-                package: ${{env.ARTIFACT_PATH}}
                 slot-name: slot
+                package: ${{env.ARTIFACT_PATH}}
 
             - name: Swap slot to production
               run: |
