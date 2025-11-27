@@ -49,6 +49,7 @@ jobs:
           uses: ./.github/workflows/deploy.yml
           with: 
             environment-name: dev
+            resource-group: rg-actionlearn-dev-europspaincentral-001
           needs: build 
           secrets: 
               AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
