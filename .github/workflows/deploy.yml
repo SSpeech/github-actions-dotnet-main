@@ -8,6 +8,9 @@ on:
             environment-name: 
                 type: string 
                 required: true
+            resources-group-name: 
+                type: string 
+                required: true
         secrets:
             AZURE_CLIENT_ID:
                 required: true       
@@ -41,5 +44,10 @@ jobs:
               uses: azure/webapps-deploy@v2 
               with: 
                 app-name: ${{secrets.AZURE_APP_NAME}}
-                package: ${{env.ARTIFACT_PATH}}
+                slot-name: slot
+                package: ${{env.ARTIFACT_PATH}}    
+                
+            - name: deploy artifact
+              run: |
+                  az webapp deployment slot swap -g ${{inputs.resources-group-name}} -n ${{ secrets.AZURE_APP_NAME }} --slot slot production --target-slot --verbose
 
